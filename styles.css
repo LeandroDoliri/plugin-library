@@ -117,7 +117,7 @@ th.num .sort { text-align: right; }
 .folder-link:focus-visible { outline-offset: 3px; }
 .sticker { display: grid; place-items: center; width: 56px; height: 56px; padding: 7px; background: #fff; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, .3); overflow: hidden; }
 .sticker.dark { background: #16232a; }
-.sticker img { color-scheme: light; display: block; width: 100%; height: 100%; object-fit: contain; }
+.sticker img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .sticker b { font: 800 1.45rem var(--display); color: #16232a; }
 .sticker.code b { font: 500 .95rem var(--mono); letter-spacing: .02em; }
 .folder-name { font: 600 1.05rem/1.18 var(--display); overflow-wrap: anywhere; }
