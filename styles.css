@@ -4,7 +4,7 @@
   --head: #10222b; --head-fg: #eef6f8; --head-muted: #a4b8c2;
   --accent: #0a6470; --accent-soft: #d9ecef; --on-accent: #ffffff; --signal: #f2b134;
   --ok: #1a7648; --ok-soft: #dbf0e4; --no: #a6431d; --no-soft: #f8e4da; --unused: #7c8b95; --unused-soft: #e6ebee;
-  --free: #1a7648; --vol: #875800; --paid: #5f4296; --unk: #55636e;
+  --vol-soft: #f5e8cc; --free: #1a7648; --vol: #875800; --paid: #5f4296; --unk: #55636e;
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --mono: "IBM Plex Mono", Consolas, monospace;
@@ -16,7 +16,7 @@
   --head: #0a1115; --head-fg: #eef6f8; --head-muted: #98acb6;
   --accent: #62c1cf; --accent-soft: #15323a; --on-accent: #08181c; --signal: #f2b134;
   --ok: #6dd6a0; --ok-soft: #143427; --no: #f09a78; --no-soft: #3c2118; --unused: #8796a0; --unused-soft: #26313a;
-  --free: #6dd6a0; --vol: #e7bd62; --paid: #c0a6ed; --unk: #aeb9c2;
+  --vol-soft: #3a2d10; --free: #6dd6a0; --vol: #e7bd62; --paid: #c0a6ed; --unk: #aeb9c2;
   --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 20px -12px rgba(0, 0, 0, .8); color-scheme: dark;
 } }
 :root[data-theme="dark"] {
@@ -24,7 +24,7 @@
   --head: #0a1115; --head-fg: #eef6f8; --head-muted: #98acb6;
   --accent: #62c1cf; --accent-soft: #15323a; --on-accent: #08181c; --signal: #f2b134;
   --ok: #6dd6a0; --ok-soft: #143427; --no: #f09a78; --no-soft: #3c2118; --unused: #8796a0; --unused-soft: #26313a;
-  --free: #6dd6a0; --vol: #e7bd62; --paid: #c0a6ed; --unk: #aeb9c2;
+  --vol-soft: #3a2d10; --free: #6dd6a0; --vol: #e7bd62; --paid: #c0a6ed; --unk: #aeb9c2;
   --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 20px -12px rgba(0, 0, 0, .8); color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -104,6 +104,7 @@ th.num .sort { text-align: right; }
 .e-Instalado { background: var(--ok-soft); color: var(--ok); }
 .e-Falta { background: var(--no-soft); color: var(--no); }
 .e-Sinuso { background: var(--unused-soft); color: var(--unused); }
+.pill.depr { background: var(--vol-soft); color: var(--vol); }
 .p { font-size: .88rem; font-weight: 500; white-space: nowrap; }
 .p-Gratis { color: var(--free); } .p-Voluntario { color: var(--vol); } .p-Pago { color: var(--paid); } .p-Sinconfirmar { color: var(--unk); }
 .empty { padding: 24px; text-align: center; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }

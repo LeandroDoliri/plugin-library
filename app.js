@@ -25,7 +25,8 @@
     { key: "estado", label: "Estado" },
     { key: "precio", label: "Precio" },
     { key: "formato", label: "Formato" },
-    { key: "conseguir", label: "Cómo conseguirlo" }
+    { key: "conseguir", label: "Cómo conseguirlo" },
+    { key: "vigencia", label: "Vigencia" }
   ];
   var FILTERS = [
     { key: "estado", label: "Estado" },
@@ -33,7 +34,8 @@
     { key: "tipo", label: "Tipo" },
     { key: "fabricante", label: "Fabricante" },
     { key: "formato", label: "Formato" },
-    { key: "conseguir", label: "Cómo conseguirlo" }
+    { key: "conseguir", label: "Cómo conseguirlo" },
+    { key: "vigencia", label: "Vigencia" }
   ];
   var TYPE_CODES = {
     "Amp y guitarra": "AMP", "Batería": "DRM", "Delay": "DLY", "Dinámica": "DYN", "EQ": "EQ", "Efecto creativo": "FX", "Filtro": "FLT", "Host y utilidades": "HST", "Imagen estéreo": "IMG", "Medición": "MTR", "Mezcla y mastering": "MIX", "Modulación": "MOD", "Piano y teclas": "KEY", "Reverb": "REV", "Sampler y librerías": "SMP", "Saturación": "SAT", "Sintetizador": "SYN", "Voz y afinación": "VOX"
@@ -49,9 +51,10 @@
 
   DATA.forEach(function (p) {
     p.formato = p.vst2 && p.vst3 ? "VST2 y VST3" : p.vst2 ? "Solo VST2" : p.vst3 ? "Solo VST3" : "Sin instalar";
+    p.vigencia = p.deprecado ? "Deprecado" : "Vigente";
   });
 
-  var state = { q: "", estado: "", precio: "", tipo: "", fabricante: "", formato: "", conseguir: "", group: "", sort: "proyectos", dir: -1, incluirSinUso: false, foldersBy: "cantidad", folderQ: "" };
+  var state = { q: "", estado: "", precio: "", tipo: "", fabricante: "", formato: "", conseguir: "", vigencia: "", group: "", sort: "proyectos", dir: -1, incluirSinUso: false, foldersBy: "cantidad", folderQ: "" };
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -86,6 +89,11 @@
     return '<a class="go" href="' + esc(p.enlace) + '" target="_blank" rel="noopener">' + (p.enlaceTercero ? "Referencia" : "Web") + " ↗</a>";
   }
   function pill(p) { return '<span class="pill e-' + esc(p.estado.replace(/\s/g, "")) + '">' + esc(p.estado) + "</span>"; }
+  function deprBadge(p) { return p.deprecado ? ' <span class="pill depr">Deprecado</span>' : ""; }
+  function notes(p) {
+    var d = p.deprecado ? p.deprecadoMotivo + (p.reemplazo ? " Reemplazo: " + p.reemplazo + "." : "") : "";
+    return esc([d, p.nota].filter(Boolean).join(" "));
+  }
   function price(p) { return '<span class="p p-' + esc(p.precio.replace(/\s/g, "")) + '">' + esc(p.precio) + "</span>"; }
 
   /* Tabla de plugins */
@@ -105,7 +113,7 @@
     }).join("") + '<th class="plain">Notas</th><th class="plain">Enlace</th></tr></thead>';
     var body = items.slice().sort(compare).map(function (p) {
       return "<tr>" + cols.map(function (c) {
-        if (c.key === "nombre") return '<td class="n">' + esc(p.nombre) + "</td>";
+        if (c.key === "nombre") return '<td class="n">' + esc(p.nombre) + deprBadge(p) + "</td>";
         if (c.key === "estado") return "<td>" + pill(p) + "</td>";
         if (c.key === "precio") return "<td>" + price(p) + "</td>";
         if (c.key === "vst2" || c.key === "vst3") return '<td class="v' + (p[c.key] ? "" : " none") + '">' + esc(p[c.key] || "—") + "</td>";
@@ -113,7 +121,7 @@
         if (c.key === "fabricante") return '<td><a href="#fabricantes/' + esc(makerSlug(p.fabricante)) + '">' + esc(p.fabricante) + "</a></td>";
         if (c.key === "tipo") return '<td><a href="#tipos/' + esc(slugify(p.tipo)) + '">' + esc(p.tipo) + "</a></td>";
         return "<td>" + esc(p[c.key]) + "</td>";
-      }).join("") + '<td class="note">' + esc(p.nota) + "</td><td>" + link(p) + "</td></tr>";
+      }).join("") + '<td class="note">' + notes(p) + "</td><td>" + link(p) + "</td></tr>";
     }).join("");
     return '<div class="tbl"><table class="' + (hide ? "inside" : "full") + '">' + head + "<tbody>" + body + "</tbody></table></div>";
   }
@@ -293,6 +301,10 @@
     });
     var free = used.filter(function (p) { return isOut(p) && (p.precio === "Gratis" || p.precio === "Voluntario"); });
     var paid = used.filter(function (p) { return isOut(p) && p.precio === "Pago"; });
+    var depr = DATA.filter(function (p) { return p.deprecado; }).sort(function (a, b) { return b.proyectos - a.proyectos || by(a.nombre, b.nombre); });
+    var deprRows = depr.map(function (p) {
+      return '<tr><td class="n">' + esc(p.nombre) + "</td><td>" + esc(p.reemplazo || "Sin reemplazo") + '</td><td class="num">' + p.proyectos + "</td><td>" + pill(p) + "</td></tr>";
+    });
     var only3 = used.filter(function (p) { return isIn(p) && p.formato === "Solo VST3"; });
     var topHead = [{ t: "Plugin" }, { t: "Fabricante o requisito" }, { t: "Proyectos", num: true }, { t: "Enlace" }];
     app.innerHTML = '<div class="stack"><div class="intro"><div><h1>Resumen</h1><p class="muted">Lo que tenés, lo que falta y qué conviene conseguir primero.</p></div></div>' +
@@ -304,6 +316,7 @@
       smallTable("De pago que faltan", "Si ya los compraste, quizá puedas volver a bajarlos.", topHead, topRows(paid, 10)) +
       smallTable("Por tipo", "Verde: instalados. Naranja: faltan. Gris: sin uso.", [{ t: "Tipo" }, { t: "Estado" }, { t: "En la compu", num: true }], typeRows) +
       smallTable("Fabricantes con más plugins", "", [{ t: "Fabricante" }, { t: "Estado" }, { t: "En la compu", num: true }], makerRows) +
+      smallTable("Deprecados", "Siguen haciendo falta para abrir tus temas viejos: no los borres sin revisar.", [{ t: "Plugin" }, { t: "Reemplazo" }, { t: "Proyectos", num: true }, { t: "Estado" }], deprRows) +
       smallTable("Instalados solo en VST3", "Tus proyectos los usan en otro formato: quizá no abran solos en temas viejos.", topHead, topRows(only3, 20)) +
       "</div></div>";
   }
@@ -319,7 +332,7 @@
       if (!items.length) return "";
       return '<section class="group"><div class="group-title"><h2>' + esc(name) + "</h2><span>" + items.length + '</span></div><p class="muted">' + esc(ACQUIRE_HINT[name]) + '</p><ul class="check-list">' + items.map(function (p, i) {
         var id = "c-" + slugify(name) + "-" + i;
-        var meta = [p.fabricante, p.tipo, p.proyectos + (p.proyectos === 1 ? " proyecto" : " proyectos"), p.requiere].filter(Boolean).join(" · ");
+        var meta = [p.deprecado ? "Deprecado" : "", p.fabricante, p.tipo, p.proyectos + (p.proyectos === 1 ? " proyecto" : " proyectos"), p.requiere].filter(Boolean).join(" · ");
         return '<li class="' + (checks[p.nombre] ? "done" : "") + '"><input type="checkbox" id="' + id + '" data-check="' + esc(p.nombre) + '"' + (checks[p.nombre] ? " checked" : "") + '><div><label class="check-name" for="' + id + '">' + esc(p.nombre) + '</label><div class="check-meta">' + esc(meta) + "</div></div><div>" + link(p) + "</div></li>";
       }).join("") + "</ul></section>";
     }).join("");
