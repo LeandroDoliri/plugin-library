@@ -23,4 +23,6 @@ Toda la lista está en `data/plugins.js`, con un plugin por línea.
 | `conseguir`, `requiere` | Cómo se consigue y qué cuenta o gestor pide |
 | `nota`, `enlace`, `enlaceTercero` | Notas, página del plugin y si esa página no es del fabricante |
 
+Los fabricantes, con su web y su logo, están en `data/makers.js`. Los logos están en `assets/logos` y pertenecen a sus fabricantes. Si un logo es blanco, poné `"oscuro": true` para usar una etiqueta oscura.
+
 Después de editar, hacé commit y push: GitHub Pages publica el cambio solo.
