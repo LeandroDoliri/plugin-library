@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Plugin Library</title>
+  <meta name="description" content="Biblioteca personal de plugins VST para Ableton Live.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <h1>Plugin Library</h1>
+        <p class="muted" id="summary"></p>
+      </div>
+      <nav class="tabs" aria-label="Secciones">
+        <a class="tab" id="tab-biblioteca" href="#biblioteca">Biblioteca</a>
+        <a class="tab" id="tab-compu-nueva" href="#compu-nueva">Compu nueva</a>
+      </nav>
+    </header>
+    <main id="app"></main>
+    <footer class="muted foot">Los precios y enlaces pueden cambiar: confirmalos en la web oficial antes de pagar o descargar.</footer>
+  </div>
+  <script src="data/plugins.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
