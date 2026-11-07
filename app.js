@@ -77,7 +77,8 @@
   function isIn(p) { return p.estado === "Instalado"; }
   function isOut(p) { return p.estado === "Falta"; }
   function isIdle(p) { return p.estado === "Sin uso"; }
-  function hasPlugin(p) { return p.estado !== "Falta"; }
+  function isAvail(p) { return p.estado === "Disponible"; }
+  function hasPlugin(p) { return p.estado === "Instalado" || p.estado === "Sin uso"; }
   function loadChecks() {
     try { return JSON.parse(localStorage.getItem(CHECK_KEY)) || {}; } catch (e) { return {}; }
   }
@@ -91,7 +92,7 @@
   function pill(p) { return '<span class="pill e-' + esc(p.estado.replace(/\s/g, "")) + '">' + esc(p.estado) + "</span>"; }
   function deprBadge(p) { return p.deprecado ? ' <span class="pill depr">Deprecado</span>' : ""; }
   function notes(p) {
-    var d = p.deprecado ? p.deprecadoMotivo + (p.reemplazo ? " Reemplazo: " + p.reemplazo + "." : "") : "";
+    var d = p.deprecado ? p.deprecadoMotivo + (p.reemplazo ? " Reemplazo: " + p.reemplazo + "." : "") : (p.reemplazaA ? "Reemplaza a " + p.reemplazaA + "." : "");
     return esc([d, p.nota].filter(Boolean).join(" "));
   }
   function price(p) { return '<span class="p p-' + esc(p.precio.replace(/\s/g, "")) + '">' + esc(p.precio) + "</span>"; }
@@ -256,7 +257,7 @@
     var key = isMaker ? "fabricante" : "tipo";
     var items = DATA.filter(function (p) { return p[key] === name; });
     var m = isMaker ? (MAKERS[name] || {}) : {};
-    var sub = items.length + (items.length === 1 ? " plugin" : " plugins") + " · " + count(items, isIn) + " instalados · " + count(items, isOut) + " faltan" + (count(items, isIdle) ? " · " + count(items, isIdle) + " sin uso" : "");
+    var sub = items.length + (items.length === 1 ? " plugin" : " plugins") + " · " + count(items, isIn) + " instalados · " + count(items, isOut) + " faltan" + (count(items, isIdle) ? " · " + count(items, isIdle) + " sin uso" : "") + (count(items, isAvail) ? " · " + count(items, isAvail) + " disponibles" : "");
     var actions = '<a class="btn on-color" href="#' + kind + '">← ' + (isMaker ? "Todos los fabricantes" : "Todos los tipos") + "</a>";
     if (m.web) actions += '<a class="btn on-color" href="' + esc(m.web) + '" target="_blank" rel="noopener">Web de ' + esc(name) + " ↗</a>";
     app.innerHTML = '<div class="stack"><section class="folder-open ' + hue(name) + '">' + (isMaker ? makerSticker(name) : typeSticker(name)) + "<div><h1>" + esc(name) + "</h1><p>" + esc(sub) + (m.nota ? " · " + esc(m.nota) : "") + '</p><div class="folder-actions">' + actions + "</div></div></section>" +
@@ -265,7 +266,7 @@
 
   /* Resumen */
   function splitBar(list) {
-    var t = list.length || 1;
+    var t = (list.length - count(list, isAvail)) || 1;
     return '<div class="split" role="img" aria-label="' + count(list, isIn) + " instalados, " + count(list, isOut) + " faltan, " + count(list, isIdle) + ' sin uso"><i class="a" style="width:' + (count(list, isIn) / t * 100).toFixed(1) + '%"></i><i class="b" style="width:' + (count(list, isOut) / t * 100).toFixed(1) + '%"></i><i class="c" style="width:' + (count(list, isIdle) / t * 100).toFixed(1) + '%"></i></div>';
   }
   function smallTable(title, sub, head, rows) {
@@ -285,7 +286,7 @@
     var prices = ["Gratis", "Voluntario", "Pago", "Sin confirmar"];
     var priceRows = prices.map(function (x) {
       var l = DATA.filter(function (p) { return p.precio === x; });
-      return "<tr><td>" + price({ precio: x }) + '</td><td class="num">' + count(l, isIn) + '</td><td class="num">' + count(l, isOut) + '</td><td class="num">' + count(l, isIdle) + '</td><td class="num"><b>' + l.length + "</b></td></tr>";
+      return "<tr><td>" + price({ precio: x }) + '</td><td class="num">' + count(l, isIn) + '</td><td class="num">' + count(l, isOut) + '</td><td class="num">' + count(l, isIdle) + '</td><td class="num">' + count(l, isAvail) + '</td><td class="num"><b>' + l.length + "</b></td></tr>";
     });
     var formatRows = ["VST2 y VST3", "Solo VST2", "Solo VST3"].map(function (f) {
       var l = DATA.filter(function (p) { return p.formato === f; });
@@ -310,7 +311,7 @@
     app.innerHTML = '<div class="stack"><div class="intro"><div><h1>Resumen</h1><p class="muted">Lo que tenés, lo que falta y qué conviene conseguir primero.</p></div></div>' +
       '<div class="tiles"><div class="tile"><b>' + used.length + '</b><span>plugins usados en proyectos</span></div><div class="tile ok"><b>' + count(DATA, isIn) + '</b><span>instalados</span></div><div class="tile no"><b>' + count(DATA, isOut) + '</b><span>faltan</span></div><div class="tile"><b>' + (totalUses ? Math.round(totalProjectsCovered / totalUses * 100) : 0) + '%</b><span>de los usos en proyectos ya cubiertos</span></div></div>' +
       '<div class="columns">' +
-      smallTable("Por precio", "", [{ t: "Precio" }, { t: "Instalados", num: true }, { t: "Faltan", num: true }, { t: "Sin uso", num: true }, { t: "Total", num: true }], priceRows) +
+      smallTable("Por precio", "", [{ t: "Precio" }, { t: "Instalados", num: true }, { t: "Faltan", num: true }, { t: "Sin uso", num: true }, { t: "Disponibles", num: true }, { t: "Total", num: true }], priceRows) +
       smallTable("Por formato", "Solo cuenta los plugins instalados.", [{ t: "Formato" }, { t: "Plugins", num: true }], formatRows) +
       smallTable("Gratis que faltan", "Los más usados primero.", topHead, topRows(free, 10)) +
       smallTable("De pago que faltan", "Si ya los compraste, quizá puedas volver a bajarlos.", topHead, topRows(paid, 10)) +
@@ -324,7 +325,7 @@
   /* Compu nueva */
   function renderNewPc() {
     var checks = loadChecks();
-    var list = DATA.filter(function (p) { return state.incluirSinUso || p.proyectos > 0; });
+    var list = DATA.filter(function (p) { return !isAvail(p) && (state.incluirSinUso || p.proyectos > 0 || p.reemplazaA); });
     var done = list.filter(function (p) { return checks[p.nombre]; }).length;
     var pct = list.length ? Math.round(done / list.length * 100) : 0;
     var sections = ACQUIRE_ORDER.map(function (name) {
@@ -382,8 +383,8 @@
     else { renderLibrary(); }
   }
   function renderMeter() {
-    var t = DATA.length || 1, a = count(DATA, isIn), b = count(DATA, isOut), c = count(DATA, isIdle);
-    document.getElementById("meter").innerHTML = '<div class="meter-bar" role="img" aria-label="' + a + " instalados, " + b + " faltan, " + c + ' sin uso"><i class="m-ok" style="width:' + (a / t * 100).toFixed(1) + '%"></i><i class="m-no" style="width:' + (b / t * 100).toFixed(1) + '%"></i><i class="m-un" style="width:' + (c / t * 100).toFixed(1) + '%"></i></div><div class="meter-legend"><span><b>' + a + "</b> instalados</span><span><b>" + b + "</b> faltan</span><span><b>" + c + "</b> sin uso</span></div>";
+    var t = (DATA.length - count(DATA, isAvail)) || 1, a = count(DATA, isIn), b = count(DATA, isOut), c = count(DATA, isIdle);
+    document.getElementById("meter").innerHTML = '<div class="meter-bar" role="img" aria-label="' + a + " instalados, " + b + " faltan, " + c + ' sin uso"><i class="m-ok" style="width:' + (a / t * 100).toFixed(1) + '%"></i><i class="m-no" style="width:' + (b / t * 100).toFixed(1) + '%"></i><i class="m-un" style="width:' + (c / t * 100).toFixed(1) + '%"></i></div><div class="meter-legend"><span><b>' + a + "</b> instalados</span><span><b>" + b + "</b> faltan</span><span><b>" + c + "</b> sin uso</span><span><b>" + count(DATA, isAvail) + "</b> disponibles</span></div>";
   }
   app.addEventListener("click", function (e) {
     var b = e.target.closest ? e.target.closest("[data-sort]") : null;

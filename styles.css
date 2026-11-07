@@ -104,6 +104,7 @@ th.num .sort { text-align: right; }
 .e-Instalado { background: var(--ok-soft); color: var(--ok); }
 .e-Falta { background: var(--no-soft); color: var(--no); }
 .e-Sinuso { background: var(--unused-soft); color: var(--unused); }
+.e-Disponible { background: var(--accent-soft); color: var(--accent); }
 .pill.depr { background: var(--vol-soft); color: var(--vol); }
 .p { font-size: .88rem; font-weight: 500; white-space: nowrap; }
 .p-Gratis { color: var(--free); } .p-Voluntario { color: var(--vol); } .p-Pago { color: var(--paid); } .p-Sinconfirmar { color: var(--unk); }
